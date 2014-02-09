@@ -1,0 +1,23 @@
+alias(yt) {
+%url_part1 = "http://gdata.youtube.com/feeds/api/videos?v=2&q=";
+%url_part2 = "&orderby=viewCount&max-results=1&alt=atom";
+%desired_video = $0-;
+%complete_video_url = %url_part1%desired_video%url_part2;
+%file = $file.localdir()yt
+%Channel = $target;
+
+http.asyncGet -w=h -i=$channel (%complete_video_url,%file) {
+%brand = $b()$k(1, 0)You$k(0, 4)Tube$o();
+
+%contents = $file.read($2);
+%title = $str.grep("<media:title type='plain'>(.*)</media:title>", %contents, "rp")[1];
+%rating = $str.replace($str.grep("<gd:rating average='(.\\..)", %contents, "rp")[1], ".", ",");
+%votes = $str.grep("numRaters='(\\d*)'", %contents, "rp")[1];
+%author = $str.grep("v=2'/><author><name>(.*)</name>", %contents, "rp")[1];
+%ts = $str.grep("<published>(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)T(\\d\\d:\\d\\d:\\d\\d).000Z</published>", %contents, "rp");
+%date = $str.replace(%ts[3]"-"%ts[2]"-"%ts[1], "-", "/");
+%time = %ts[4];
+%link = $str.grep("<yt:videoid>(.*)</yt:videoid>", %contents, "rp")[1];
+msg %Channel "%brand - $b%title$b - Link: http://www.youtube.com/watch?v=%link - Rating: $b%rating/5$b, Votes: $b%votes$b, uploaded on $b%date$b $b%time$b";
+};
+}
