@@ -1,0 +1,2 @@
+var telo = body.childNodes[3].firstChild.firstChild.childNodes[1].firstChild;
+telo.removeChild(telo.firstChild);
