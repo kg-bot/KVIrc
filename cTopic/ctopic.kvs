@@ -27,7 +27,7 @@ if($0) {
 			echo "$k(3)You can't see this channels topic because you're not on that channel and it's secret channel."
 		}
 		else {
-			msg %current_channel "$k(3)$0 topic is:$k() %I;
+			msg %current_channel "$k(3)$0 topic is:$k() %I";
 		}
 	}
 	else {
