@@ -1,0 +1,59 @@
+alias(ctopic) {
+if($0) {
+	raw TOPIC $0;
+	timer -s (ctopic,4000,$0,$target) { ctopic1 $0; };
+}
+else {
+	raw TOPIC $target;
+	timer -s (ctopic,4000,$0,$target) { ctopic1; };
+}
+}
+event(403,ctopic) {
+%I = $1;
+}
+
+alias(ctopic1) {
+%current_channel = $target;
+if($0) {
+	%first_char = $str.left($0,1);
+	if(%first_char == "#") {
+		if(%I == 403) {
+			echo "$k(3)Channel$k(7) $0 $k(3)doesn't exist.";
+		}
+		elseif(%I == 331) {
+			msg %current_channel "$k(3)Channel$k(7) $0 $k(3)still doesn't have topic set.";
+		}
+		elseif(%I == 442) {
+			echo "$k(3)You can't see this channels topic because you're not on that channel and it's secret channel."
+		}
+		else {
+			msg %current_channel "$k(3)$0 topic is:$k() %I;
+		}
+	}
+	else {
+		echo "$k(3)Usage of this command is:"
+		echo "$k(9)    /ctopic$k(7) [#ChannelName]"
+		msg %current_channel "$k(7)$0 $k()$k(3)topic is:$k() %I";
+	}
+}
+else {
+	%window_type = $window.type();
+	if(%window_type != "channel") {
+		echo "$k(3)You can't use this command in $k(7)%window_type$k()."
+		echo "$k(3)This command is available only $k(4)in channel$k(3), unles you specify channel name."
+	}
+	else {
+		msg %current_channel "$k(7)$target $k()$k(3)topic is:$k() %I";
+	}
+}
+}
+
+event(331,ctopic) {
+%I = $1;
+}
+event(332,ctopic) {
+%I = $4;
+}
+event(442,ctopic) {
+%I = $1;
+}
